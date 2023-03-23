@@ -1,4 +1,4 @@
-remote_theme: jekyll-theme-simplex
+remote_theme: jekyll-theme-minimal
 logo_img: /logo.jpg #Absolute path to the logo. If not specified, the title will be displayed instead.
 copyright: © Golasowski 2020 #Your copyright.
 
