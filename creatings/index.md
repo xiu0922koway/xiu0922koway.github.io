@@ -1,6 +1,7 @@
 # Creatings
 # 作品集
-[portfolio for game design application](Portfolio Zihan Liu.pdf)
+[portfolio for game design application](Portfolio_Zihan_Liu.pdf)
+
 
 ## 写作
 Twine制作的简单互动小说 [短吻鳄](alligator.html)
