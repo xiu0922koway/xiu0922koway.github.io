@@ -1,0 +1,109 @@
+body{
+	background-color:#f4f4f4;
+}
+
+
+.container{
+	width:80%;
+	margin:auto;
+	padding-top:100px;
+	padding-bottom:600px;
+	border-bottom: 50px solid rgba(0, 0, 0, 0.7);
+	background-color:#FFFFFF;
+	
+}
+
+
+/************先尝试做出目录的效果************/
+
+
+#block1 {
+	float: left;
+	width:20%;
+}/*block用来写float*/
+
+#block1 a, a:link, a:visited {
+	font: normal 25px arial, sans-serif;
+	text-decoration: none;
+	letter-spacing: 1px;
+	color: #FFFFFF;
+	text-align: center;/*字体*/
+	
+	display: block; 
+	width: 99%;
+	padding-top: 25px;
+	padding-bottom:25px;
+	border-right:10px solid #FFFFFF;
+	background:rgba(0, 0, 0, 0.7);/*背景块*/
+	
+	-webkit-transition: all 1s ease;
+	-moz-transition: all 1s ease;
+	-o-transition: all 1s ease;/*各种浏览器的动画*/	
+}
+
+#block1 a:hover {
+	color: #FFFFFF;
+	text-align: center;
+	background:black;
+	display: block;
+	width: 120%;
+	border: none;
+}
+
+
+/************做出主要内容************/
+
+
+
+#box2 {
+	padding-top: 10%;
+	padding-left: 5%;
+	background-color:#FFFFFF;
+}
+
+/****侧边*****/
+
+#sidebar {
+	float:left;
+	width:20%;
+	background: #e0e0e0;
+	border-top: solid 10px;
+	padding:10px;
+	padding-bottom: 30px;
+	margin:0px;
+	font:11px lucida sans unicode, arial, tahoma;color:#454545;
+
+}
+
+#sidebar a, a:link, a:visited {
+	width:20%;
+	background: #e0e0e0;
+	display:inline;
+	font:11px lucida sans-serif ;color:#454545;
+	padding:0px;
+	border:0px;
+}
+
+#sidebar a:hover {
+	font:11px lucida sans-serif ;color:#B40404;
+}
+
+
+/****主面板*****/
+
+#mainblock {
+	float:left;
+	width:60%;
+	border-top: 5px solid #CCC;
+	border-bottom: 5px solid #CCC;
+	padding-left:3%;
+	padding-top:1%;
+	margin-left:10%;
+	margin-right:3%;
+	font:25px lucida sans-serif;
+}
+
+b, strong {
+	letter-spacing: 0px;
+	font-weight: bold;
+}

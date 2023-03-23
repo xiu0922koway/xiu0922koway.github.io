@@ -1,0 +1,167 @@
+
+.nivoSlider {
+    background: no-repeat 50% 50%;
+}
+
+td {
+	color: #333333;
+}
+body {
+	color: #999999;
+	margin: 0px;
+	padding: 0px;
+	line-height: 16px;
+	background: #F3F3F3;
+}
+/*************************************************
+DIVIDERS (LAYOUT HEADER, MAIN COLUMN, SIDE COLUMN)
+*************************************************/
+#wrapper {
+	background:#FFF;
+	margin: 0px auto;
+	border-top:25px solid #000;
+	border-bottom:70px solid #000;
+	width: 900px;
+	padding:25px;
+	height:100%;
+}
+#content {
+  	margin: 20px auto;
+	width: 900px;	
+	z-index: 3;
+	background: none;
+}
+#nav {
+	height: 55px;
+	width: 100%;
+	text-align: right;
+	position: absolute;
+	top:100px;
+	bottom:0px;
+	float: center;
+	z-index:100;
+	background: none!important;
+}
+#header {
+	margin: 0px auto;
+	z-index:100;
+	width:900px;
+	height:100px;
+}
+#entry {border-top:1px solid #CCC;border-bottom:#CCC 1px solid;padding:7px;font:20px lucida sans unicode, arial, tahoma;margin-bottom:20px;}
+#side { font:17px lucida sans unicode, arial, tahoma;color:#454545;padding-right:10px;
+}
+#side p {padding-bottom:0px;}
+
+/*************************************************
+HEADERS (H1, H2)
+*************************************************/
+h3 {
+	font: bold 17px/10px arial, helvetica;
+	color: #000;
+	text-decoration: none;margin-bottom:10px;
+	text-align: left;padding-right:10px;
+}
+h1 {
+	font: bold 30px/10px arial, helvetica;
+	color: #B40404;
+	letter-spacing: 0px;
+	text-align: left;
+	background-color: none;
+}
+h2 {
+	font: bold 13px lucida sans unicode, arial, tahoma!important;
+	color:#999;
+	margin-top:0px!important;
+}
+/*************************************************
+LINKS
+*************************************************/
+#nav a, a:link {
+	font: normal 15px arial, helvetica;
+	text-decoration: none;
+	letter-spacing: 1px!important;
+	text-transform: uppercase!important;
+	color: #FFFFFF;
+	margin: 0px!important;
+	text-align: center;
+	display: block;
+	padding-top: 20px;
+	padding-bottom:22px;
+	width: 200px;
+	border-right:0px solid #121212!important;
+	background:rgba(0, 0, 0, 0.7)!important;
+	}
+
+
+}
+#side a, a:link {
+	padding: 0px;
+	display: block; width:230px;
+	font:11px lucida sans unicode, arial, tahoma;color:#454545;
+}
+#main a, a:link {
+	font: normal 17px lucida sans unicode, arial, tahoma;
+	color: #454545;
+	text-transform:none!Important;
+	display: inline;
+	letter-spacing:0px!Important;
+	background: none!important;
+	border-left:0px solid #121212!important;
+}
+
+
+a.ttl, .ttl { 
+	font: bold 15px lucida sans unicode, arial, tahoma!important;
+	color: #7D4100!important;
+	display: inline;
+	letter-spacing: 0px!important;
+	background: none!important;
+	text-transform: none!important;
+	border-left:0px solid #121212!important;
+}
+/*************************************************
+TEXT EFFECTS (BOLD, ITALICS, UNDERLINE, STRIKE)
+*************************************************/
+b, strong {
+	color: #99cbff;
+	letter-spacing: 0px;
+	font-weight: bold;
+}
+i, em {
+	color: #777777;
+	letter-spacing: 0px;
+	font:20px lucida sans unicode, arial, tahoma;
+}
+u { 
+	color:#000000;
+	border-bottom: 1px dotted #AEA4AE;
+	text-decoration: underline;
+}
+s {
+	color: #D0C9D0;
+	text-decoration: line-through;
+}
+::-moz-selection { 
+background; none;
+color: #B6A942; 
+}
+.userpic {
+	float: left;
+	padding: 7px;
+	background: #e7e7e7;
+	margin: 0px;
+	border: none;
+	margin-right: 5px!important;
+}
+blockquote{
+	color: #666666;
+	background: #EFEFEF;
+	padding: 10px;
+	border-top: 1px solid #E4E4E4;
+	border-bottom: 1px solid #E4E4E4;
+	text-align:center;
+}
+ul{
+	list-style: circle;
+}
