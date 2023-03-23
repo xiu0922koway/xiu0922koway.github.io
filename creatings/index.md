@@ -1,6 +1,6 @@
 # Creatings
 # 作品集
-[portfolio for game design application](Portfolio_Zihan_Liu.pdf)
+[portfolio for game design application](Portfolio-Zihan-Liu.pdf)
 
 
 ## 写作
