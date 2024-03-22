@@ -4,4 +4,4 @@
 
 
 # 桌游
-[Snow Mountain Adventure, 2-player-version for WODC]
+[Snow Mountain Adventure, 2-player-version for WODC](Snow Mountain Adventure 2-player-version.pdf)
