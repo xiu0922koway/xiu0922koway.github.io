@@ -37,6 +37,7 @@
             line-height: 2;
             color: #333;
             position: relative;
+            white-space: nowrap;
         }
 
         .blank-space {
@@ -128,6 +129,35 @@
 
         .word-item.selected {
             font-size: 24px;
+        }
+
+        /* 移动端适配 - 整体缩小，防止换行 */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .text-display {
+                transform: scale(0.7);
+                transform-origin: center center;
+                white-space: nowrap;
+            }
+        }
+        
+        @media screen and (max-width: 480px) {
+            .text-display {
+                transform: scale(0.6);
+                transform-origin: center center;
+                white-space: nowrap;
+            }
+        }
+        
+        @media screen and (max-width: 360px) {
+            .text-display {
+                transform: scale(0.5);
+                transform-origin: center center;
+                white-space: nowrap;
+            }
         }
 
     </style>
