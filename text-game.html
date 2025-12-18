@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文本填充游戏</title>
+    <style>
+        /* 自定义字体加载 */
+        @font-face {
+            font-family: 'Typewriter';
+            src: url('fonts/Huiwenmincho-improved.woff2') format('woff2'),
+                 url('fonts/Huiwenmincho-improved.woff') format('woff'),
+                 url('fonts/Huiwenmincho-improved.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Typewriter', monospace;
+            background: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .text-display {
+            font-size: 24px;
+            line-height: 2;
+            color: #333;
+            position: relative;
+        }
+
+        .blank-space {
+            display: inline-block;
+            min-width: 75px;
+            height: 40px;
+            margin: 0 8px;
+            vertical-align: middle;
+            position: relative;
+        }
+
+        .blank-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #333;
+            z-index: 1;
+        }
+
+
+        .selected-word-display {
+            position: absolute;
+            bottom: 5%;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: #333;
+            font-size: 24px;
+            line-height: 40px;
+            user-select: none;
+            white-space: nowrap;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .word-list-container.show ~ .selected-word-display {
+            display: none;
+        }
+
+        .word-list-container {
+            display: none;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            transform: translateY(50%);
+            height: 600px;
+            width: 100%;
+            z-index: 1000;
+            overflow: hidden;
+            cursor: grab;
+            box-sizing: border-box;
+        }
+
+        .word-list-container.show {
+            display: block;
+        }
+
+        .word-list-container.dragging {
+            cursor: grabbing;
+        }
+
+        .word-list {
+            position: relative;
+            padding: 5px;
+            transition: transform 0s;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .word-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 0px;
+            margin: 2px 0;
+            font-size: 18px;
+            user-select: none;
+            color: #333;
+            width: 100%;
+            text-align: center;
+            height: 40px;
+            line-height: 24px;
+            transition: opacity 0.2s;
+            box-sizing: border-box;
+        }
+
+        .word-item.selected {
+            font-size: 24px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="text-display" id="textDisplay">
+        <span class="blank-space" id="blank1">
+            <div class="blank-line"></div>
+            <div class="selected-word-display" id="selectedWord1"></div>
+            <div class="word-list-container" id="wordListContainer1">
+                <div class="word-list" id="wordList1"></div>
+            </div>
+        </span>
+        <span class="blank-space" id="blank2">
+            <div class="blank-line"></div>
+            <div class="selected-word-display" id="selectedWord2"></div>
+            <div class="word-list-container" id="wordListContainer2">
+                <div class="word-list" id="wordList2"></div>
+            </div>
+        </span>
+        <span class="blank-space" id="blank3">
+            <div class="blank-line"></div>
+            <div class="selected-word-display" id="selectedWord3"></div>
+            <div class="word-list-container" id="wordListContainer3">
+                <div class="word-list" id="wordList3"></div>
+            </div>
+        </span>，不
+        <span class="blank-space" id="blank4">
+            <div class="blank-line"></div>
+            <div class="selected-word-display" id="selectedWord4"></div>
+            <div class="word-list-container" id="wordListContainer4">
+                <div class="word-list" id="wordList4"></div>
+            </div>
+        </span>
+        <span class="blank-space" id="blank5">
+            <div class="blank-line"></div>
+            <div class="selected-word-display" id="selectedWord5"></div>
+            <div class="word-list-container" id="wordListContainer5">
+                <div class="word-list" id="wordList5"></div>
+            </div>
+        </span>
+        <span class="blank-space" id="blank6">
+            <div class="blank-line"></div>
+            <div class="selected-word-display" id="selectedWord6"></div>
+            <div class="word-list-container" id="wordListContainer6">
+                <div class="word-list" id="wordList6"></div>
+            </div>
+        </span>
+    </div>
+
+    <script>
+        // 列表水平位置配置（单位：px）
+        // 正值向右移动，负值向左移动，0表示居中对齐
+        const LIST_X_OFFSET = -6;
+        
+        // 列表垂直对齐位置配置（单位：px）
+        // 相对于列表容器中心（300px）的偏移量
+        // 正值向下移动，负值向上移动，0表示列表中央
+        // 用于对齐 selected-word-display 的位置
+        const LIST_ALIGNMENT_OFFSET = -23;
+        const LIST_CONTAINER_HEIGHT = 600;
+        const LIST_ALIGNMENT_Y = LIST_CONTAINER_HEIGHT / 2 + LIST_ALIGNMENT_OFFSET; // 277px
+        
+        // 每个下划线的宽度配置（单位：px）
+        // 格式：{ "blank-space的ID": 宽度值 }
+        // 如果某个ID没有配置，将使用默认宽度 75px
+        const BLANK_WIDTH_CONFIG = {
+            "blank1": 75,
+            "blank2": 90,
+            "blank3": 90,
+            "blank4": 75,
+            "blank5": 90,
+            "blank6": 90
+        };
+        
+        // 每个下划线对应的词语列表配置
+        // 格式：{ "blank-space的ID": [词语数组] }
+        // 如果某个ID没有配置，将使用默认词语列表
+        const WORD_LISTS_CONFIG = {
+            "blank1": ["编译", "卸载", "做", "骂", "玩", "吃掉", "梦到", "凝视", "触碰"],
+            "blank2": ["年度", "美味的", "独立", "好", "   ", "坏", "寒冷的", "柔软的", "孤独的"],
+            "blank3": ["宝宝", "老公", "星星", "游戏", "   ", "花朵", "雪", "地铁", "未来"],
+            "blank4": ["编译", "卸载", "做", "骂", "玩", "吃掉", "梦到", "凝视", "触碰"],
+            "blank5": ["年度", "美味的", "独立", "好", "   ", "坏", "寒冷的", "柔软的", "孤独的"],
+            "blank6": ["宝宝", "老公", "星星", "游戏", "   ", "花朵", "雪", "地铁", "未来"],
+        };
+        
+        // 默认词语列表（当某个blank-space没有在配置中指定时使用）
+        let defaultWords = [];
+
+        fetch('wordBank.json')
+            .then(response => response.json())
+            .then(data => {
+                const wordBank = data;
+                defaultWords = [];
+                wordBank.themes.forEach(theme => {
+                    theme.words.forEach(word => {
+                        if (!defaultWords.includes(word)) {
+                            defaultWords.push(word);
+                        }
+                    });
+                });
+                initializeWordLists();
+            })
+            .catch(error => {
+                // 使用默认词语数据
+                defaultWords = ["玩", "做", "骂", "卸载", "吃掉", "烹饪"];
+                initializeWordLists();
+            });
+
+        function initializeWordLists() {
+            const blankSpaces = document.querySelectorAll('.blank-space');
+            
+            blankSpaces.forEach((blankSpace) => {
+                const container = blankSpace.querySelector('.word-list-container');
+                const wordList = blankSpace.querySelector('.word-list');
+                
+                // 获取当前blank-space对应的词语列表和宽度配置
+                const blankSpaceId = blankSpace.id;
+                const wordsForThisBlank = WORD_LISTS_CONFIG[blankSpaceId] || defaultWords;
+                const blankWidth = BLANK_WIDTH_CONFIG[blankSpaceId] || 75;
+                
+                // 应用宽度配置
+                blankSpace.style.minWidth = `${blankWidth}px`;
+                
+                // 应用水平位置配置
+                if (LIST_X_OFFSET !== 0) {
+                    container.style.left = `${LIST_X_OFFSET}px`;
+                    container.style.right = 'auto';
+                }
+                
+                // 填充词语列表
+                wordsForThisBlank.forEach((word, index) => {
+                    const wordItem = document.createElement('div');
+                    wordItem.className = 'word-item';
+                    wordItem.textContent = word;
+                    wordItem.dataset.word = word;
+                    wordItem.dataset.index = index;
+                    wordList.appendChild(wordItem);
+                });
+
+                // 设置列表初始位置
+                const itemHeight = 44; // 40px height + 4px margin
+                const alignmentY = LIST_ALIGNMENT_Y; // 使用统一配置的对齐位置
+                
+                // 计算中间词语的索引（如果有7个选第4个index=3，如果有6个选第3个index=2）
+                const middleIndex = Math.floor((wordsForThisBlank.length - 1) / 2);
+                
+                // 初始位置：让中间词语的中心对齐到 selected-word-display 的位置
+                const state = {
+                    currentOffsetY: alignmentY - (middleIndex * itemHeight) - (itemHeight / 2),
+                    isDragging: false,
+                    startY: 0,
+                    startOffsetY: 0,
+                    hideTimeout: null
+                };
+                
+                wordList.style.transform = `translateY(${state.currentOffsetY}px)`;
+                
+                // 初始填充中间词语
+                const middleItem = wordList.querySelector(`[data-index="${middleIndex}"]`);
+                if (middleItem) {
+                    middleItem.classList.add('selected');
+                    showSelectedWord(blankSpace, middleItem.dataset.word);
+                }
+                
+                // 存储状态到容器
+                container.__dragState = state;
+
+                // 显示列表
+                function showList() {
+                    if (state.hideTimeout) {
+                        clearTimeout(state.hideTimeout);
+                        state.hideTimeout = null;
+                    }
+                    container.classList.add('show');
+                    // 隐藏选中文字显示
+                    const selectedDisplay = blankSpace.querySelector('.selected-word-display');
+                    if (selectedDisplay) {
+                        selectedDisplay.style.display = 'none';
+                    }
+                }
+
+                // 隐藏列表（延迟）
+                function hideList() {
+                    state.hideTimeout = setTimeout(() => {
+                        container.classList.remove('show');
+                        // 显示选中文字显示
+                        const selectedDisplay = blankSpace.querySelector('.selected-word-display');
+                        if (selectedDisplay && selectedDisplay.textContent) {
+                            selectedDisplay.style.display = 'block';
+                        }
+                    }, 100);
+                }
+
+                // 鼠标进入blank-space或container时显示列表
+                blankSpace.addEventListener('mouseenter', showList);
+                container.addEventListener('mouseenter', showList);
+
+                // 鼠标离开blank-space和container时隐藏列表
+                blankSpace.addEventListener('mouseleave', (e) => {
+                    // 检查是否移动到container
+                    if (!container.contains(e.relatedTarget)) {
+                        hideList();
+                    }
+                });
+                
+                container.addEventListener('mouseleave', (e) => {
+                    // 检查是否移动到blank-space
+                    if (!blankSpace.contains(e.relatedTarget)) {
+                        hideList();
+                    }
+                });
+
+                container.addEventListener('mousedown', (e) => {
+                    state.isDragging = true;
+                    state.startY = e.clientY;
+                    state.startOffsetY = state.currentOffsetY;
+                    container.classList.add('dragging');
+                    wordList.style.transition = 'none';
+                    e.preventDefault();
+                });
+
+                document.addEventListener('mousemove', (e) => {
+                    if (!state.isDragging) return;
+                    
+                    const deltaY = e.clientY - state.startY;
+                    const newOffsetY = state.startOffsetY + deltaY;
+                    
+                    // 限制拖拽范围（使用统一配置的对齐位置）
+                    const alignmentY = LIST_ALIGNMENT_Y;
+                    const wordsCount = wordList.querySelectorAll('.word-item').length;
+                    const minOffset = alignmentY - (wordsCount * itemHeight - itemHeight / 2);
+                    const maxOffset = alignmentY - itemHeight / 2;
+                    state.currentOffsetY = Math.max(minOffset, Math.min(maxOffset, newOffsetY));
+                    
+                    wordList.style.transform = `translateY(${state.currentOffsetY}px)`;
+                    checkAlignment(blankSpace, state.currentOffsetY);
+                });
+
+                document.addEventListener('mouseup', () => {
+                    if (state.isDragging) {
+                        state.isDragging = false;
+                        container.classList.remove('dragging');
+                        wordList.style.transition = 'transform 0s';
+                        
+                        // 吸附到最近的词语（立即完成，无缓动）
+                        snapToNearest(blankSpace, state.currentOffsetY, state);
+                    }
+                });
+
+            });
+        }
+
+        function checkAlignment(blankSpace, offsetY) {
+            const wordList = blankSpace.querySelector('.word-list');
+            const items = wordList.querySelectorAll('.word-item');
+            
+            // 使用统一配置的对齐位置
+            const alignmentY = LIST_ALIGNMENT_Y;
+            const itemHeight = 44; // 40px height + 4px margin
+            
+            // 找到最接近对齐线的词语，并计算所有距离
+            let nearestItem = null;
+            let minDistance = Infinity;
+            const distances = [];
+            
+            items.forEach((item, index) => {
+                // 计算项目中心相对于容器的位置
+                // offsetY是列表的顶部位置，每个item向下排列
+                const itemTop = offsetY + (index * itemHeight);
+                const itemCenter = itemTop + (itemHeight / 2);
+                const distance = Math.abs(alignmentY - itemCenter);
+                
+                distances.push(distance);
+                
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearestItem = item;
+                }
+            });
+
+            // 找到最大距离（用于计算透明度）
+            const maxDistance = Math.max(...distances);
+            
+            // 根据距离设置透明度和选中状态
+            items.forEach((item, index) => {
+                const distance = distances[index];
+                // 计算透明度：距离越远，透明度越低
+                // 使用平方根函数让渐变更平滑
+                const opacity = Math.max(0.2, 1 - Math.sqrt(distance / maxDistance) * 0.8);
+                item.style.opacity = opacity;
+                
+                // 移除之前的选中状态
+                item.classList.remove('selected');
+            });
+
+            // 自动填充最接近的词语
+            if (nearestItem && minDistance < itemHeight / 2) {
+                // 标记为选中
+                nearestItem.classList.add('selected');
+                // 显示选中的文字
+                showSelectedWord(blankSpace, nearestItem.dataset.word);
+            }
+        }
+
+        function snapToNearest(blankSpace, currentOffsetY, state) {
+            const wordList = blankSpace.querySelector('.word-list');
+            const items = wordList.querySelectorAll('.word-item');
+            
+            // 使用统一配置的对齐位置
+            const alignmentY = LIST_ALIGNMENT_Y;
+            const itemHeight = 44;
+            
+            let nearestIndex = 0;
+            let minDistance = Infinity;
+            
+            items.forEach((item, index) => {
+                const itemTop = currentOffsetY + (index * itemHeight);
+                const itemCenter = itemTop + (itemHeight / 2);
+                const distance = Math.abs(alignmentY - itemCenter);
+                
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearestIndex = index;
+                }
+            });
+
+            // 吸附到最近的词语，让词语中心对齐中央
+            const targetOffset = alignmentY - (nearestIndex * itemHeight) - (itemHeight / 2);
+            
+            // 移除所有选中状态
+            items.forEach(item => item.classList.remove('selected'));
+            
+            // 设置选中状态
+            if (items[nearestIndex]) {
+                items[nearestIndex].classList.add('selected');
+                showSelectedWord(blankSpace, items[nearestIndex].dataset.word);
+            }
+            
+            // 更新状态
+            if (state) {
+                state.currentOffsetY = targetOffset;
+            }
+            
+            wordList.style.transition = 'transform 0s';
+            wordList.style.transform = `translateY(${targetOffset}px)`;
+            
+            // 立即检查对齐（无需延迟）
+            checkAlignment(blankSpace, targetOffset);
+        }
+
+        function showSelectedWord(blankElement, word) {
+            const selectedDisplay = blankElement.querySelector('.selected-word-display');
+            if (selectedDisplay) {
+                selectedDisplay.textContent = word;
+            }
+        }
+    </script>
+</body>
+</html>
